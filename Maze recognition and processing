@@ -1,0 +1,17 @@
+import cv2
+
+originalImage = cv2.imread('PXy1i.jpg')
+grayImage = cv2.cvtColor(originalImage, cv2.COLOR_BGR2GRAY)
+
+(thresh, blackAndWhiteImage) = cv2.threshold(grayImage,65, 255, cv2.THRESH_BINARY)
+newPicture = cv2.adaptiveThreshold(grayImage,255,cv2.ADAPTIVE_THRESH_MEAN_C,\
+            cv2.THRESH_BINARY,11,2)
+newPicture = cv2.adaptiveThreshold(grayImage,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
+            cv2.THRESH_BINARY,11,2)
+blackAndWhiteImage = cv2.medianBlur(blackAndWhiteImage,5)
+
+cv2.imshow('Black white image', blackAndWhiteImage)
+cv2.imshow('Original image', originalImage)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
