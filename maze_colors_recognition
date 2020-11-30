@@ -1,0 +1,25 @@
+import numpy as np
+import cv2
+
+boundaries = [
+	([0, 70, 50], [10, 255, 255],[170,70,50], [180,255,255]),
+	([100, 50, 50], [130, 255, 255],0, 0),
+	([50, 50, 120], [70, 255, 255],0, 0),
+    ([20, 100, 100], [30, 255, 255],0, 0)
+]
+image = cv2.imread('maze_color.png')
+hsvFrame = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
+
+for (mask1_low, mask1_high,mask2_low,mask2_high) in boundaries:
+	lower1 = np.array(mask1_low, dtype = "uint8")
+	upper1 = np.array(mask1_high, dtype = "uint8")
+	lower2 = np.array(mask2_low, dtype="uint8")
+	upper2 = np.array(mask2_high, dtype="uint8")
+
+	mask1 = cv2.inRange(hsvFrame, lower1, upper1)
+	mask2 = cv2.inRange(hsvFrame, lower2, upper2)
+	mask = mask1 + mask2
+	output = cv2.bitwise_and(image, image, mask = mask)
+
+	cv2.imshow("images", np.hstack([image, output]))
+	cv2.waitKey(0)
