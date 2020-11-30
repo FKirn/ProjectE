@@ -39,8 +39,7 @@ while(True):
                 cv2.circle(imageFrame, (int(x), int(y)), int(radius), colors[key], 2)      #drawing a circle round the found object
                 cv2.line(imageFrame, (320, 240), (int(x), int(y)), colors[key], 2)         #drawing a line from the center of the frame to the circle
 
-    cv2.imshow("Frame", imageFrame)
-    cv2.imshow('mask', output)
+    cv2.imshow("images", np.hstack([imageFrame, output]))       #only able to shut down using q
     key = cv2.waitKey(1) & 0xFF
     if key == ord("q"):
         break
