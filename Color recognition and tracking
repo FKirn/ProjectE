@@ -1,20 +1,15 @@
 import numpy as np
 import cv2
 
-webcam = cv2.VideoCapture(0)
-
-#lower = {'red': (161, 155, 84), 'green': (65, 60, 60), 'blue': (94, 80, 2), }
-#upper = {'red': (179, 255, 255), 'green': (80, 255, 255), 'blue': (120, 255, 255)}
-#colors = {'red':(0,0,255), 'green':(0,255,0), 'blue':(255,0,0)}
-
 lower = {'red': [(0, 100, 100),(161,100,100)], 'green': [(50, 50, 120),(0,0,0)], 'blue': [(100, 50, 50),(0,0,0)], }         #adding parameters for color recognition
-upper = {'red': [(10, 255, 255),(179,255,255)], 'green': [(70, 255, 255),(0,0,0)], 'blue': [(130, 255, 255),(0,0,0)]}
+upper = {'red': [(10, 255, 255),(179,255,255)], 'green': [(70, 255, 255),(0,0,0)], 'blue': [(130, 255, 255),(0,0,0)]}       #adding parameters for color recognition        
 colors = {'red':(0,0,255), 'green':(0,255,0), 'blue':(255,0,0)}                                                             #adding parameters for color circles 
+
+webcam = cv2.VideoCapture(0)
             
 while(True):
     _,imageFrame = webcam.read()
     hsvFrame = cv2.cvtColor(imageFrame,cv2.COLOR_BGR2HSV)             #transfering image from BGR to HSV
-
 
     for key,value in upper.items():
 
