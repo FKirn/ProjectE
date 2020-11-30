@@ -3,32 +3,44 @@ import cv2
 
 webcam = cv2.VideoCapture(0)
 
-lower = {'red': (161, 155, 84), 'green': (25, 52, 72), 'blue': (94, 80, 2), }
-upper = {'red': (179, 255, 255), 'green': (102, 255, 255), 'blue': (126, 255, 255)}
-colors = {'red':(0,0,255), 'green':(0,255,0), 'blue':(255,0,0)}
+#lower = {'red': (161, 155, 84), 'green': (65, 60, 60), 'blue': (94, 80, 2), }
+#upper = {'red': (179, 255, 255), 'green': (80, 255, 255), 'blue': (120, 255, 255)}
+#colors = {'red':(0,0,255), 'green':(0,255,0), 'blue':(255,0,0)}
+
+lower = {'red': [(0, 100, 100),(161,100,100)], 'green': [(50, 50, 120),(0,0,0)], 'blue': [(100, 50, 50),(0,0,0)], }         #adding parameters for color recognition
+upper = {'red': [(10, 255, 255),(179,255,255)], 'green': [(70, 255, 255),(0,0,0)], 'blue': [(130, 255, 255),(0,0,0)]}
+colors = {'red':(0,0,255), 'green':(0,255,0), 'blue':(255,0,0)}                                                             #adding parameters for color circles 
+            
 while(True):
     _,imageFrame = webcam.read()
-    hsvFrame = cv2.cvtColor(imageFrame,cv2.COLOR_BGR2HSV)
+    hsvFrame = cv2.cvtColor(imageFrame,cv2.COLOR_BGR2HSV)             #transfering image from BGR to HSV
 
 
-    for key, value in upper.items():
+    for key,value in upper.items():
 
-        mask = cv2.inRange(hsvFrame, lower[key], upper[key])
-        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((3,3),np.uint8),iterations=2)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_DILATE, np.ones((3,3),np.uint8))
-        mask = cv2.dilate(mask,np.ones((3,3),np.uint8),iterations = 1)
-        res_color = cv2.bitwise_and(imageFrame,imageFrame,mask=mask)
+        lower1 = np.array(lower[key][0], dtype="uint8")             #defining first lower mask
+        upper1 = np.array(upper[key][0], dtype="uint8")             #defining first higher mask
+        lower2 = np.array(lower[key][1], dtype="uint8")             #defining second lower mask
+        upper2 = np.array(upper[key][1], dtype="uint8")             #defining second higher mask
 
-        cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
+        mask1 = cv2.inRange(hsvFrame, lower1, upper1)
+        mask2 = cv2.inRange(hsvFrame, lower2, upper2)
+        mask = mask1 + mask2
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8), iterations=2)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_DILATE, np.ones((3, 3), np.uint8))
+        mask = cv2.dilate(mask, np.ones((3, 3), np.uint8), iterations=1)
+        output = cv2.bitwise_and(imageFrame, imageFrame, mask=mask)             #isolating preffered color from the image frame
+
+        cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]        
         if (len(cnts) > 0):
-            c = max(cnts, key=cv2.contourArea)
-            ((x, y), radius) = cv2.minEnclosingCircle(c)
+            c = max(cnts, key=cv2.contourArea)      
+            ((x, y), radius) = cv2.minEnclosingCircle(c)                #defining a circle with a minimal radius arounf the found object
             if radius > 5:
-                cv2.circle(imageFrame, (int(x), int(y)), int(radius), colors[key], 2)
-                cv2.line(imageFrame, (320, 240), (int(x), int(y)), colors[key], 2)
+                cv2.circle(imageFrame, (int(x), int(y)), int(radius), colors[key], 2)      #drawing a circle round the found object
+                cv2.line(imageFrame, (320, 240), (int(x), int(y)), colors[key], 2)         #drawing a line from the center of the frame to the circle
 
     cv2.imshow("Frame", imageFrame)
-    cv2.imshow('mask', mask)
+    cv2.imshow('mask', output)
     key = cv2.waitKey(1) & 0xFF
     if key == ord("q"):
         break
